@@ -10,10 +10,10 @@ public class Constants {
 
     // ── Griglia ──────────────────────────────────────────────────────────────
     public static final int TILE   = 60;           // pixel per cella
-    public static final int COLS   = 14;           // colonne
-    public static final int ROWS   = 9;            // righe
-    public static final int WIDTH  = COLS * TILE;  // larghezza area di gioco
-    public static final int HEIGHT = ROWS * TILE + 70; // + barra UI
+    public static final int COLS   = 14;           // colonne (celle)
+    public static final int ROWS   = 9;            // righe   (celle)
+    public static final int WIDTH  = COLS * TILE;  // larghezza area di gioco (pixel)
+    public static final int HEIGHT = ROWS * TILE + 70; // + barra UI          (pixel)
 
 
     // ── Percorso nemici ({colonna, riga} in sequenza) ─────────────────────
