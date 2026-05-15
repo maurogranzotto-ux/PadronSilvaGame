@@ -19,6 +19,8 @@ public class GameTest extends Application {
 
         // 2. Istanziamo un nemico (Wave 1)
         Enemy testEnemy = new Enemy(1);
+        Tower testTower = new Tower(8,8);
+        Bullet testBullet = new Bullet(8,8, testEnemy);
 
         // 3. Game Loop (AnimationTimer chiama handle circa 60 volte al secondo)
         new AnimationTimer() {
@@ -32,6 +34,7 @@ public class GameTest extends Application {
 
                 // --- LOGICA ---
                 testEnemy.update(dt);
+                testBullet.update(dt);
 
                 // --- RENDERING ---
                 // Puliamo lo sfondo
@@ -43,6 +46,8 @@ public class GameTest extends Application {
 
                 // Disegniamo il nemico
                 testEnemy.draw(gc);
+                testTower.draw(gc);
+                testBullet.draw(gc);
 
                 // Feedback in console se raggiunge la fine
                 // Nota: dovrai aggiungere un getter 'isReachedEnd()' nella tua classe Enemy
