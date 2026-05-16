@@ -1,5 +1,6 @@
 package com.example.tdpadronsilva;
 
+import com.example.claudetd.files.WaveManager;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -8,6 +9,9 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GameTest extends Application {
 
@@ -21,6 +25,9 @@ public class GameTest extends Application {
         Enemy testEnemy = new Enemy(1);
         Tower testTower = new Tower(8,8);
         Bullet testBullet = new Bullet(8,8, testEnemy);
+        WaveManager testWave= new WaveManager();
+        List<Enemy> enemies= new ArrayList<>();
+        enemies.add(testEnemy);
 
         // 3. Game Loop (AnimationTimer chiama handle circa 60 volte al secondo)
         new AnimationTimer() {
@@ -35,6 +42,7 @@ public class GameTest extends Application {
                 // --- LOGICA ---
                 testEnemy.update(dt);
                 testBullet.update(dt);
+                testWave.update(now,enemies);
 
                 // --- RENDERING ---
                 // Puliamo lo sfondo
@@ -48,6 +56,7 @@ public class GameTest extends Application {
                 testEnemy.draw(gc);
                 testTower.draw(gc);
                 testBullet.draw(gc);
+
 
                 // Feedback in console se raggiunge la fine
                 // Nota: dovrai aggiungere un getter 'isReachedEnd()' nella tua classe Enemy

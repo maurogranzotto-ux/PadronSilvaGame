@@ -5,4 +5,6 @@ module com.example.tdpadronsilva {
 
     opens com.example.tdpadronsilva to javafx.fxml;
     exports com.example.tdpadronsilva;
+    exports com.example.claudetd.files;
+    opens com.example.claudetd.files to javafx.fxml;
 }
