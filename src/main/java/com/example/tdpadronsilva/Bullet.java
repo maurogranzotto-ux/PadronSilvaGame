@@ -20,14 +20,11 @@ import javafx.scene.paint.Color;
  */
 public class Bullet {
 
-
     // Posizione
     private double x, y;
 
-
     // Riferimento al bersaglio
     private final Enemy target;
-
 
     // Statistiche
     private double speed = Constants.BULLET_SPEED;

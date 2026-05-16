@@ -8,7 +8,7 @@ import java.util.List;
 
 public class Tower {
 
-    public final int col, row;
+    private final int col, row;
 
     private double range    = Constants.TOWER_RANGE;
     private double fireRate = Constants.TOWER_FIRE_RATE;

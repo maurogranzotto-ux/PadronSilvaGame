@@ -2,75 +2,78 @@ package com.example.tdpadronsilva;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class GameTest extends Application {
 
+    private GameMap map;
+    private java.util.List<Enemy> enemies;
+    private java.util.List<Tower> towers;
+    private WaveManager waveManager;
+
     @Override
     public void start(Stage stage) {
-        // 1. Setup della finestra (usa le tue costanti per le dimensioni se le hai)
-        Canvas canvas = new Canvas(800, 600);
+
+        Canvas canvas = new Canvas(Constants.WIDTH, Constants.HEIGHT);
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
-        // 2. Istanziamo un nemico (Wave 1)
-        Enemy testEnemy = new Enemy(1);
-        Tower testTower = new Tower(8,8);
-        Bullet testBullet = new Bullet(8,8, testEnemy);
+        // Inizializza
+        map         = new GameMap();
+        enemies     = new java.util.ArrayList<>();
+        towers      = new java.util.ArrayList<>();
+        waveManager = new WaveManager();
+        waveManager.startNextWave();
 
-        // 3. Game Loop (AnimationTimer chiama handle circa 60 volte al secondo)
+        // Piazza qualche torre fissa per vedere se si disegnano
+        towers.add(new Tower(1, 3));
+        towers.add(new Tower(5, 2));
+        towers.add(new Tower(9, 5));
+
+        // Click per piazzare torri
+        canvas.setOnMouseClicked(e -> {
+            int col = (int)(e.getX() / Constants.TILE);
+            int row = (int)(e.getY() / Constants.TILE);
+            if (map.canPlace(col, row)) {
+                towers.add(new Tower(col, row));
+                map.placeTower(col, row);
+            }
+        });
+
+        stage.setScene(new Scene(new VBox(canvas)));
+        stage.setTitle("GameTest - visuale");
+        stage.setResizable(false);
+        stage.show();
+
+        // Game loop
         new AnimationTimer() {
-            long lastTime = System.nanoTime();
+            long lastNano = 0;
 
             @Override
-            public void handle(long now) {
-                // Calcolo del dt (delta time) in secondi
-                double dt = (now - lastTime) / 1_000_000_000.0;
-                lastTime = now;
+            public void handle(long nowNano) {
+                double dt = (lastNano == 0) ? 0.0 : (nowNano - lastNano) / 1_000_000_000.0;
+                lastNano = nowNano;
 
-                // --- LOGICA ---
-                testEnemy.update(dt);
-                testBullet.update(dt);
+                // Spawn nemici
+                waveManager.update(nowNano, enemies);
 
-                // --- RENDERING ---
-                // Puliamo lo sfondo
-                gc.setFill(Color.LIGHTGRAY);
-                gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+                // Aggiorna nemici
+                enemies.removeIf(e -> e.isDead() || e.isReachedEnd());
+                for (Enemy e : enemies) e.update(dt);
 
-                // (Opzionale) Disegniamo il percorso per vedere se il nemico lo segue bene
-                drawPath(gc);
+                // Prossima ondata
+                if (waveManager.isWaveComplete(enemies)) waveManager.startNextWave();
 
-                // Disegniamo il nemico
-                testEnemy.draw(gc);
-                testTower.draw(gc);
-                testBullet.draw(gc);
-
-                // Feedback in console se raggiunge la fine
-                // Nota: dovrai aggiungere un getter 'isReachedEnd()' nella tua classe Enemy
-                // if (testEnemy.isReachedEnd()) System.out.println("Nemico arrivato!");
+                // Disegna
+                gc.clearRect(0, 0, Constants.WIDTH, Constants.HEIGHT);
+                map.draw(gc);
+                for (Tower t  : towers)  t.draw(gc);
+                for (Enemy e  : enemies) e.draw(gc);
             }
         }.start();
-
-        stage.setScene(new Scene(new Group(canvas)));
-        stage.setTitle("Test Movimento Nemico");
-        stage.show();
-    }
-
-    // Metodo di supporto per vedere i waypoint di Constants.PATH
-    private void drawPath(GraphicsContext gc) {
-        gc.setStroke(Color.DARKGRAY);
-        gc.setLineWidth(2);
-        for (int i = 0; i < Constants.PATH.length - 1; i++) {
-            double x1 = Constants.PATH[i][0] * Constants.TILE + Constants.TILE / 2.0;
-            double y1 = Constants.PATH[i][1] * Constants.TILE + Constants.TILE / 2.0;
-            double x2 = Constants.PATH[i+1][0] * Constants.TILE + Constants.TILE / 2.0;
-            double y2 = Constants.PATH[i+1][1] * Constants.TILE + Constants.TILE / 2.0;
-            gc.strokeLine(x1, y1, x2, y2);
-        }
     }
 
     public static void main(String[] args) {
