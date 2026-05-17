@@ -19,40 +19,25 @@ import javafx.scene.paint.Color;
  *   - il bersaglio raggiunge la fine del percorso
  */
 public class Bullet {
-
-
-    // ── Posizione ─────────────────────────────────────────────────────────
+    // Posizione
     private double x, y;
-
-
-    // ── Riferimento al bersaglio ──────────────────────────────────────────
+    // Riferimento al bersaglio
     private final Enemy target;
-
-
-    // ── Statistiche ───────────────────────────────────────────────────────
+    // Statistiche
     private double speed = Constants.BULLET_SPEED;
     private int damage = Constants.BULLET_DAMAGE;
-
-
-    // ── Stato ─────────────────────────────────────────────────────────────
+    // Stato
     private boolean hasHit = false;
-
-
-    // ─────────────────────────────────────────────────────────────────────
-
 
     public Bullet(double startX, double startY, Enemy target) {
         this.x = startX;
         this.y = startY;
         this.target = target;
     }
-
-
     public void update(double dt) {
         double dx = target.getX() - x;
         double dy = target.getY() - y;
         double dist = Math.hypot(dx, dy);
-
 
         // Raggio di collisione: se siamo vicini abbastanza, colpiamo
         if (dist < 8) {
@@ -61,13 +46,10 @@ public class Bullet {
             hasHit = true;
             return;
         }
-
-
         double move = speed * dt;
         x += (dx / dist) * move;
         y += (dy / dist) * move;
     }
-
 
     public void draw(GraphicsContext gc) {
         gc.setFill(Color.web("#f1c40f"));
@@ -117,4 +99,6 @@ public class Bullet {
     public void setHasHit(boolean hasHit) {
         this.hasHit = hasHit;
     }
+
 }
+

@@ -8,22 +8,12 @@ import java.util.List;
 
 public class Tower {
 
+    private final int col, row;
 
-    // ── Posizione nella griglia ───────────────────────────────────────────
-    public final int col, row;
-
-
-    // ── Statistiche ───────────────────────────────────────────────────────
     private double range    = Constants.TOWER_RANGE;
     private double fireRate = Constants.TOWER_FIRE_RATE;
 
-
-    // ── Stato interno ─────────────────────────────────────────────────────
     private double cooldown = 0; // secondi rimanenti prima del prossimo sparo
-
-
-    // ─────────────────────────────────────────────────────────────────────
-
 
     public Tower(int col, int row) {
         this.col = col;
@@ -31,18 +21,18 @@ public class Tower {
     }
 
 
-    /** Centro X in pixel */
+    // Centro X in pixel
     public double centerX() { return col * Constants.TILE + Constants.TILE / 2.0; }
 
 
-    /** Centro Y in pixel */
+    // Centro Y in pixel
     public double centerY() { return row * Constants.TILE + Constants.TILE / 2.0; }
-
 
     /**
      * Trova il nemico più avanzato nel raggio.
      * Restituisce null se nessun nemico è a tiro.
      */
+
     public Enemy findTarget(List<Enemy> enemies) {
         Enemy best  = null;
         int   bestIndex = -1;
