@@ -1,6 +1,5 @@
 package com.example.tdpadronsilva;
 
-import com.example.tdpadronsilva.Constants;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 

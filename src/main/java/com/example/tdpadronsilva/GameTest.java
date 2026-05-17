@@ -2,75 +2,55 @@ package com.example.tdpadronsilva;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class GameTest extends Application {
 
+    private GameState state;
+    private Renderer  renderer;
+
     @Override
     public void start(Stage stage) {
-        // 1. Setup della finestra (usa le tue costanti per le dimensioni se le hai)
-        Canvas canvas = new Canvas(800, 600);
+
+        Canvas canvas = new Canvas(Constants.WIDTH, Constants.HEIGHT);
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
-        // 2. Istanziamo un nemico (Wave 1)
-        Enemy testEnemy = new Enemy(1);
-        Tower testTower = new Tower(8,8);
-        Bullet testBullet = new Bullet(8,8, testEnemy);
+        // Usa GameState e Renderer che hai già scritto
+        state    = new GameState();
+        renderer = new Renderer(gc, state);
 
-        // 3. Game Loop (AnimationTimer chiama handle circa 60 volte al secondo)
+        // Click del mouse per piazzare torri
+        canvas.setOnMouseClicked(e -> {
+            int col = (int)(e.getX() / Constants.TILE);
+            int row = (int)(e.getY() / Constants.TILE);
+            state.tryPlaceTower(col, row);
+        });
+
+        stage.setScene(new Scene(new VBox(canvas)));
+        stage.setTitle("Tower Defense");
+        stage.setResizable(false);
+        stage.show();
+
+        // Game loop
         new AnimationTimer() {
-            long lastTime = System.nanoTime();
+            long lastNano = 0;
 
             @Override
-            public void handle(long now) {
-                // Calcolo del dt (delta time) in secondi
-                double dt = (now - lastTime) / 1_000_000_000.0;
-                lastTime = now;
+            public void handle(long nowNano) {
+                double dt = (lastNano == 0) ? 0.0
+                        : (nowNano - lastNano) / 1_000_000_000.0;
+                lastNano = nowNano;
 
-                // --- LOGICA ---
-                testEnemy.update(dt);
-                testBullet.update(dt);
-
-                // --- RENDERING ---
-                // Puliamo lo sfondo
-                gc.setFill(Color.LIGHTGRAY);
-                gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-
-                // (Opzionale) Disegniamo il percorso per vedere se il nemico lo segue bene
-                drawPath(gc);
-
-                // Disegniamo il nemico
-                testEnemy.draw(gc);
-                testTower.draw(gc);
-                testBullet.draw(gc);
-
-                // Feedback in console se raggiunge la fine
-                // Nota: dovrai aggiungere un getter 'isReachedEnd()' nella tua classe Enemy
-                // if (testEnemy.isReachedEnd()) System.out.println("Nemico arrivato!");
+                if (!state.gameOver) {
+                    state.update(dt, nowNano);
+                }
+                renderer.render();
             }
         }.start();
-
-        stage.setScene(new Scene(new Group(canvas)));
-        stage.setTitle("Test Movimento Nemico");
-        stage.show();
-    }
-
-    // Metodo di supporto per vedere i waypoint di Constants.PATH
-    private void drawPath(GraphicsContext gc) {
-        gc.setStroke(Color.DARKGRAY);
-        gc.setLineWidth(2);
-        for (int i = 0; i < Constants.PATH.length - 1; i++) {
-            double x1 = Constants.PATH[i][0] * Constants.TILE + Constants.TILE / 2.0;
-            double y1 = Constants.PATH[i][1] * Constants.TILE + Constants.TILE / 2.0;
-            double x2 = Constants.PATH[i+1][0] * Constants.TILE + Constants.TILE / 2.0;
-            double y2 = Constants.PATH[i+1][1] * Constants.TILE + Constants.TILE / 2.0;
-            gc.strokeLine(x1, y1, x2, y2);
-        }
     }
 
     public static void main(String[] args) {
